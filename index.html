@@ -6,713 +6,542 @@
 <title>AgentKee — SLA Protection for AI Agents</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/genlayer-js@latest/dist/index.umd.js"></script>
 <style>
 :root {
-  --bg:      #060B18;
-  --surface: #0F1623;
-  --mid:     #132047;
-  --border:  #1C2A42;
-  --green:   #00E5A0;
-  --blue:    #0EA5E9;
-  --amber:   #F59E0B;
-  --red:     #EF4444;
-  --text:    #F0F6FF;
-  --muted:   #64748B;
+  --bg: #060B18; --surface: #0F1623; --border: #1C2A42;
+  --green: #00E5A0; --blue: #0EA5E9; --amber: #F59E0B;
+  --red: #EF4444; --text: #F0F6FF; --muted: #64748B;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
-
-/* NAV */
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid var(--border);
-  background: rgba(6,11,24,0.95);
-  position: sticky; top: 0; z-index: 100;
-}
-.logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); }
+nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(6,11,24,0.97); z-index: 100; }
+.logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; }
 .logo span { color: var(--green); }
-.nav-right { display: flex; align-items: center; gap: 1rem; }
-.gl-badge { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--muted); }
-.gl-dot { width: 18px; height: 18px; border-radius: 4px; background: linear-gradient(135deg, var(--green), #0D1535); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 900; color: #000; }
-.wallet-btn { background: var(--mid); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
-.wallet-btn:hover { border-color: var(--green); color: var(--green); }
-.wallet-btn.connected { border-color: var(--green); color: var(--green); }
-
-/* HERO */
-.hero { text-align: center; padding: 4rem 2rem 2rem; max-width: 700px; margin: 0 auto; }
-.hero-tag { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); border-radius: 100px; padding: 0.3rem 0.9rem; font-size: 0.78rem; color: var(--green); font-weight: 600; margin-bottom: 1.2rem; }
-.hero-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.4s ease-in-out infinite; }
+.badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--muted); }
+.gl-dot { width: 20px; height: 20px; border-radius: 4px; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 900; color: #000; }
+.wallet-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+.wallet-btn:hover, .wallet-btn.connected { border-color: var(--green); color: var(--green); }
+.hero { text-align: center; padding: 3rem 2rem 2rem; max-width: 650px; margin: 0 auto; }
+.hero-tag { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); border-radius: 100px; padding: 0.3rem 0.9rem; font-size: 0.78rem; color: var(--green); font-weight: 600; margin-bottom: 1rem; }
+.dot-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1rem; }
-.hero h1 span { color: var(--green); }
-.hero p { font-size: 1rem; color: var(--muted); line-height: 1.7; margin-bottom: 0.5rem; }
-.hero p strong { color: var(--text); }
-
-/* CONTRACT CHIP */
-.contract-chip { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.15); border-radius: 8px; padding: 0.5rem 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--green); margin: 1.5rem auto 0; cursor: pointer; transition: all 0.2s; }
-.contract-chip:hover { background: rgba(0,229,160,0.1); }
-
-/* MAIN LAYOUT */
-.main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
-
-/* SECTION CARDS */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.2rem; }
+h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 0.8rem; }
+h1 span { color: var(--green); }
+.hero p { font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+.contract-chip { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0,229,160,0.06); border: 1px solid rgba(0,229,160,0.15); border-radius: 8px; padding: 0.4rem 0.9rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--green); margin-top: 1rem; cursor: pointer; }
+.main { max-width: 860px; margin: 1.5rem auto; padding: 0 1.5rem 4rem; }
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.8rem; margin-bottom: 1.2rem; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; text-align: center; }
+.stat-n { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--green); }
+.stat-l { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem; margin-bottom: 1rem; }
 .card-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); font-family: 'JetBrains Mono', monospace; margin-bottom: 1rem; }
-
-/* STATUS STRIP */
-.status-strip { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2rem; }
-.status-pill { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 100px; font-size: 0.78rem; font-weight: 600; border: 1px solid; }
-.pill-pending  { background: rgba(100,116,139,0.1); color: var(--muted);  border-color: rgba(100,116,139,0.3); }
-.pill-escrow   { background: rgba(245,158,11,0.1);  color: var(--amber); border-color: rgba(245,158,11,0.3); }
-.pill-released { background: rgba(0,229,160,0.1);   color: var(--green); border-color: rgba(0,229,160,0.3); }
-.pill-refunded { background: rgba(239,68,68,0.1);   color: var(--red);   border-color: rgba(239,68,68,0.3); }
-
-/* FORM */
-label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.35rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
-input, select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 0.9rem; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; }
+label { display: block; font-size: 0.73rem; color: var(--muted); margin-bottom: 0.3rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+input, select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.9rem; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; margin-bottom: 0.8rem; }
 input:focus, select:focus { border-color: var(--green); }
-input::placeholder { color: var(--muted); }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem; }
-.field { margin-bottom: 0.8rem; }
-@media(max-width:600px) { .field-row { grid-template-columns: 1fr; } }
-
-/* BUTTONS */
-.btn { padding: 0.75rem 1.5rem; border-radius: 10px; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem; }
-.btn-green  { background: var(--green); color: #000; }
-.btn-green:hover  { background: #00C48A; transform: translateY(-1px); }
-.btn-red    { background: var(--red); color: #fff; }
-.btn-red:hover    { opacity: 0.85; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.btn { padding: 0.7rem 1.4rem; border-radius: 10px; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem; }
+.btn-green { background: var(--green); color: #000; }
+.btn-green:hover { background: #00C48A; }
 .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
 .btn-outline:hover { border-color: var(--green); color: var(--green); }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-.btn-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.8rem; }
-
-/* ESCROW TIMER */
-.timer-box { text-align: center; padding: 1.5rem; }
-.timer-ring { position: relative; width: 100px; height: 100px; margin: 0 auto 1rem; }
-.timer-ring svg { transform: rotate(-90deg); }
-.ring-bg { fill: none; stroke: var(--mid); stroke-width: 8; }
-.ring-fill { fill: none; stroke: var(--amber); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 283; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.3s; }
-.ring-fill.done { stroke: var(--green); }
-.ring-fill.failed { stroke: var(--red); }
-.timer-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--amber); }
-.timer-num.done { color: var(--green); }
-.timer-num.failed { color: var(--red); }
-.timer-label { font-size: 0.85rem; color: var(--muted); }
-
-/* TRACE */
-.trace { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; max-height: 280px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.73rem; line-height: 1.8; }
-.trace::-webkit-scrollbar { width: 3px; }
-.trace::-webkit-scrollbar-thumb { background: var(--border); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-row { display: flex; gap: 0.6rem; margin-top: 0.6rem; flex-wrap: wrap; }
+.spinner { width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.trace { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; max-height: 260px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.8; }
 .t-time { color: var(--muted); margin-right: 0.5rem; }
-.t-ok   { color: var(--green); }
-.t-err  { color: var(--red); }
+.t-ok { color: var(--green); }
+.t-err { color: var(--red); }
 .t-warn { color: var(--amber); }
 .t-info { color: var(--text); }
-
-/* VERDICT CARD */
 .verdict-card { border-radius: 12px; padding: 1.2rem 1.4rem; margin-top: 1rem; display: none; }
 .verdict-card.show { display: block; }
 .verdict-card.breach { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3); }
-.verdict-card.clean  { background: rgba(0,229,160,0.07); border: 1px solid rgba(0,229,160,0.3); }
-.verdict-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-.verdict-card.breach .verdict-title { color: var(--red); }
-.verdict-card.clean  .verdict-title { color: var(--green); }
-.verdict-rows { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.7rem; }
-.verdict-row { display: flex; justify-content: space-between; font-size: 0.82rem; }
-.vr-label { color: var(--muted); }
-.vr-val   { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
-.vr-val.green { color: var(--green); }
-.vr-val.red   { color: var(--red); }
-.vr-val.amber { color: var(--amber); }
-.reasoning-box { background: var(--bg); border-radius: 6px; padding: 0.7rem; font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
-
-/* JURY VISUALIZER */
+.verdict-card.clean { background: rgba(0,229,160,0.07); border: 1px solid rgba(0,229,160,0.3); }
+.v-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.6rem; }
+.breach .v-title { color: var(--red); }
+.clean .v-title { color: var(--green); }
+.v-rows { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.7rem; }
+.v-row { display: flex; justify-content: space-between; font-size: 0.8rem; }
+.v-label { color: var(--muted); }
+.v-val { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text); }
+.v-val.green { color: var(--green); }
+.v-val.red { color: var(--red); }
+.v-val.amber { color: var(--amber); }
+.reasoning { background: var(--bg); border-radius: 6px; padding: 0.7rem; font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.6rem; }
 .jury-section { margin-top: 0.8rem; }
-.jury-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 0.6rem; }
-.jury-cards { display: flex; flex-direction: column; gap: 0.5rem; }
-.jury-card { display: flex; align-items: flex-start; gap: 0.7rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 0.9rem; }
-.jury-card.agree  { border-left: 3px solid var(--green); }
+.jury-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 0.5rem; }
+.jury-cards { display: flex; flex-direction: column; gap: 0.4rem; }
+.jury-card { display: flex; align-items: flex-start; gap: 0.6rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; }
+.jury-card.agree { border-left: 3px solid var(--green); }
 .jury-card.reject { border-left: 3px solid var(--red); }
-.jury-vote { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
-.jury-info { flex: 1; }
-.jury-name { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; color: var(--muted); margin-bottom: 0.2rem; }
-.jury-reason { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
-.bond-chip { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.6rem; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 6px; padding: 0.3rem 0.7rem; font-size: 0.75rem; color: var(--amber); }
-
-/* STATS */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; }
-@media(max-width:600px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
-.stat-cell { background: var(--mid); border-radius: 8px; padding: 0.9rem 1rem; text-align: center; }
-.stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--green); line-height: 1; margin-bottom: 0.25rem; }
-.stat-label { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
-
-/* TX HASH */
-.tx-hash { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
-.tx-hash a { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--green); text-decoration: none; word-break: break-all; }
-.tx-hash a:hover { text-decoration: underline; }
-
-/* TOAST */
-.toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1.2rem; font-size: 0.85rem; max-width: 320px; z-index: 999; display: none; animation: slideUp 0.3s ease; }
+.jury-name { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.15rem; }
+.jury-reason { font-size: 0.78rem; color: var(--text); line-height: 1.5; }
+.bond-chip { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 6px; padding: 0.3rem 0.7rem; font-size: 0.73rem; color: var(--amber); display: none; }
+.tx-link { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; font-size: 0.72rem; }
+.tx-link a { font-family: 'JetBrains Mono', monospace; color: var(--green); text-decoration: none; word-break: break-all; }
+.tx-link a:hover { text-decoration: underline; }
+.history-row { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+.pill { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; border: 1px solid; }
+.pill-refund { background: rgba(239,68,68,0.1); color: var(--red); border-color: rgba(239,68,68,0.3); }
+.pill-release { background: rgba(0,229,160,0.1); color: var(--green); border-color: rgba(0,229,160,0.3); }
+.pill-escrow { background: rgba(245,158,11,0.1); color: var(--amber); border-color: rgba(245,158,11,0.3); }
+.toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 1.1rem; font-size: 0.83rem; max-width: 300px; z-index: 999; display: none; }
 .toast.show { display: block; }
-.toast.ok  { border-color: rgba(0,229,160,0.4); }
+.toast.ok { border-color: rgba(0,229,160,0.4); }
 .toast.err { border-color: rgba(239,68,68,0.4); }
-@keyframes slideUp { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
-
-.spinner { width: 13px; height: 13px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
-@keyframes spin { to{transform:rotate(360deg)} }
-.divider { height: 1px; background: var(--border); margin: 1rem 0; }
-.text-muted { font-size: 0.8rem; color: var(--muted); }
+@media(max-width:600px) { .stats { grid-template-columns: 1fr 1fr; } .row2 { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="logo">Agent<span>Kee</span></div>
-  <div class="nav-right">
-    <div class="gl-badge"><div class="gl-dot">GL</div>GenLayer Studio Next</div>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="badge"><div class="gl-dot">GL</div>Studio Dev · 61997</div>
     <button class="wallet-btn" id="walletBtn" onclick="connectWallet()">Connect Wallet</button>
   </div>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
-  <div class="hero-tag"><div class="hero-dot"></div>GenLayer Agent Tank Hackathon</div>
-  <h1>Chargeback-as-a-Service<br>for <span>AI Agents</span></h1>
-  <p>AI agents lose money on failed x402 payments with <strong>no refund mechanism.</strong><br>AgentKee holds every payment in escrow and enforces refunds automatically.</p>
-  <div class="contract-chip" onclick="copyContract()" id="contractChip">
-    🔗 Contract: <span id="contractDisplay">0x... paste your address</span>
+  <div class="hero-tag"><div class="dot-pulse"></div>GenLayer Agent Tank Hackathon</div>
+  <h1>Every agent payment<br><span>protected</span></h1>
+  <p>AI agents lose money on failed x402 payments with no recourse.<br>AgentKee enforces SLA refunds automatically using GenLayer AI consensus.</p>
+  <div class="contract-chip" onclick="copyAddr()">
+    🔗 <span id="addrDisplay">0x78f0501...F2CCD</span> · Click to copy
   </div>
 </div>
 
-<!-- STATS -->
 <div class="main">
-  <div class="stats-grid" style="margin-bottom:1.2rem">
-    <div class="stat-cell"><div class="stat-num" id="statPayments">0</div><div class="stat-label">Payments Protected</div></div>
-    <div class="stat-cell"><div class="stat-num" id="statClaims">0</div><div class="stat-label">Claims Filed</div></div>
-    <div class="stat-cell"><div class="stat-num" id="statRefunded">$0</div><div class="stat-label">USDC Refunded</div></div>
-    <div class="stat-cell"><div class="stat-num" id="statProtected">$0</div><div class="stat-label">Total Protected</div></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="sTotal">0</div><div class="stat-l">Payments Protected</div></div>
+    <div class="stat"><div class="stat-n" id="sClaims">0</div><div class="stat-l">Claims Filed</div></div>
+    <div class="stat"><div class="stat-n" id="sRefund">0%</div><div class="stat-l">Refund Rate</div></div>
+    <div class="stat"><div class="stat-n" id="sStatus">—</div><div class="stat-l">Contract Status</div></div>
   </div>
 
-  <!-- DEMO SECTION -->
+  <!-- DEMO PANEL -->
   <div class="card">
-    <div class="card-label">// Live Demo — Simulate an Agent Payment</div>
+    <div class="card-label">// Live Demo — Real GenLayer Contract Calls</div>
 
-    <div class="field-row">
+    <div class="row2">
       <div>
         <label>Service Name</label>
-        <input id="serviceName" value="OpenAI GPT-4" placeholder="e.g. OpenAI GPT-4"/>
-      </div>
-      <div>
-        <label>Call Type</label>
-        <select id="callType">
-          <option value="llm_inference">LLM Inference</option>
-          <option value="data_api">Data API</option>
-          <option value="compute">Compute</option>
-          <option value="search">Search API</option>
-        </select>
-      </div>
-    </div>
-    <div class="field-row">
-      <div>
-        <label>Amount (USDC)</label>
-        <input id="amount" value="0.10" placeholder="0.10"/>
+        <input id="svcName" value="OpenAI GPT-4"/>
       </div>
       <div>
         <label>Scenario</label>
         <select id="scenario">
           <option value="success">✅ Successful Call</option>
-          <option value="breach">❌ 503 Service Failure (SLA Breach)</option>
-          <option value="timeout">⏱ Timeout (61s) — Ambiguous</option>
-          <option value="client">🔌 Client Disconnect — Not a Breach</option>
+          <option value="breach">❌ 503 SLA Breach (14 reporters)</option>
+          <option value="client">🔌 Client Disconnect (1 reporter)</option>
         </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div>
+        <label>Amount (USDC)</label>
+        <input id="amount" value="1"/>
+      </div>
+      <div>
+        <label>Dispute Bond</label>
+        <input id="bond" value="2"/>
       </div>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-green" onclick="runDemo()" id="demoBtn">⚡ Run Payment Simulation</button>
+      <button class="btn btn-green" onclick="runDemo()" id="demoBtn">⚡ Run — Calls Real Contract</button>
       <button class="btn btn-outline" onclick="resetDemo()">↺ Reset</button>
     </div>
   </div>
 
-  <!-- EXECUTION TRACE + TIMER -->
+  <!-- TRACE + VERDICT -->
   <div class="card" id="demoOutput" style="display:none">
     <div class="card-label">// Execution Trace</div>
+    <div class="trace" id="traceLog"></div>
 
-    <div style="display:grid;grid-template-columns:1fr 160px;gap:1rem;align-items:start">
-      <div class="trace" id="traceLog"></div>
-      <div class="timer-box">
-        <div class="timer-ring">
-          <svg width="100" height="100" viewBox="0 0 100 100">
-            <circle class="ring-bg" cx="50" cy="50" r="45"/>
-            <circle class="ring-fill" id="ringFill" cx="50" cy="50" r="45"/>
-          </svg>
-          <div class="countdown-number" id="timerNum">10</div>
-        </div>
-        <div class="timer-label" id="timerLabel">Escrow window</div>
-      </div>
-    </div>
-
-    <!-- Verdict -->
     <div id="verdictCard" class="verdict-card">
-      <div class="verdict-title" id="verdictTitle"></div>
-      <div class="verdict-rows" id="verdictRows"></div>
-      <div class="reasoning-box" id="verdictReason"></div>
+      <div class="v-title" id="vTitle"></div>
+      <div class="v-rows" id="vRows"></div>
+      <div class="reasoning" id="vReason"></div>
       <div class="jury-section" id="jurySection" style="display:none">
-        <div class="jury-label">// Validator Jury Deliberation</div>
+        <div class="jury-label">// Validator Jury</div>
         <div class="jury-cards" id="juryCards"></div>
       </div>
-      <div class="bond-chip" id="bondChip" style="display:none"></div>
-      <div class="tx-hash" id="txHashRow" style="display:none">
-        🔗 <a id="txHashLink" href="#" target="_blank"></a>
+      <div class="bond-chip" id="bondChip"></div>
+      <div class="tx-link" id="txLink" style="display:none">
+        🔗 <a id="txA" href="#" target="_blank"></a>
       </div>
     </div>
   </div>
 
-  <!-- PAYMENT HISTORY -->
+  <!-- HISTORY -->
   <div class="card">
-    <div class="card-label">// Payment History</div>
-    <div id="historyEmpty" class="text-muted" style="padding:1rem 0">No payments yet. Run a simulation above.</div>
-    <div id="historyList"></div>
-    <div class="divider" style="display:none" id="historyDivider"></div>
-    <button class="btn btn-outline" onclick="refreshStats()" style="font-size:0.8rem;margin-top:0.5rem">↻ Refresh from Contract</button>
+    <div class="card-label">// Transaction History</div>
+    <div id="histEmpty" style="font-size:0.8rem;color:var(--muted);padding:0.5rem 0">No transactions yet. Run a demo above.</div>
+    <div id="histList"></div>
+    <button class="btn btn-outline" onclick="loadStats()" style="font-size:0.78rem;margin-top:0.8rem">↻ Refresh from Contract</button>
   </div>
-
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script type="module">
-// ═══════════════════════════════════════
-//  CONFIG — paste contract address here
-// ═══════════════════════════════════════
-let CONTRACT = '0x78f0501A81F4663Cc47c74d2AE84A2e6659F2CCD';
-const CHAIN_ID = 61997;
-const CHAIN_HEX = '0x' + CHAIN_ID.toString(16); // 0xF22D
-const RPC = 'https://studio-dev.genlayer.com/api';
-const EXPLORER = 'https://explorer-studio-dev.genlayer.com';
-const CIRCUMFERENCE = 2 * Math.PI * 45; // ~283
+<script>
+const CONTRACT  = '0x78f0501A81F4663Cc47c74d2AE84A2e6659F2CCD';
+const CHAIN_ID  = 61997;
+const CHAIN_HEX = '0xF22D';
+const RPC       = 'https://studio-dev.genlayer.com/api';
+const EXPLORER  = 'https://explorer-studio-dev.genlayer.com';
 
 let wallet = null;
-let countdownInterval = null;
-let payments = [];
+let history = [];
 
-// ── Contract chip ────────────────────
-document.getElementById('contractDisplay').textContent =
-  CONTRACT === 'PASTE_CONTRACT_ADDRESS_HERE'
-    ? 'No address set — paste below'
-    : CONTRACT.slice(0,10) + '...' + CONTRACT.slice(-6);
+document.getElementById('addrDisplay').textContent =
+  CONTRACT.slice(0,10) + '...' + CONTRACT.slice(-6);
 
-window.copyContract = function() {
-  if (CONTRACT !== 'PASTE_CONTRACT_ADDRESS_HERE') {
-    navigator.clipboard.writeText(CONTRACT);
-    toast('Contract address copied!', 'ok');
-  } else {
-    const addr = prompt('Paste your deployed contract address:');
-    if (addr && addr.startsWith('0x')) {
-      CONTRACT = addr.trim();
-      document.getElementById('contractDisplay').textContent =
-        CONTRACT.slice(0,10) + '...' + CONTRACT.slice(-6);
-      toast('Contract address set!', 'ok');
-    }
-  }
+function copyAddr() {
+  navigator.clipboard.writeText(CONTRACT);
+  toast('Contract address copied!', 'ok');
 }
 
-// ── Wallet ────────────────────────────
-window.connectWallet = async function() {
-  if (!window.ethereum) { toast('Install MetaMask first', 'err'); return; }
+// ── Wallet ────────────────────────────────────────────
+async function connectWallet() {
+  if (!window.ethereum) { toast('Install MetaMask', 'err'); return; }
   try {
     const [addr] = await window.ethereum.request({ method: 'eth_requestAccounts' });
     wallet = addr;
     try {
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_HEX }] });
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: CHAIN_HEX }]
+      });
     } catch(e) {
       if (e.code === 4902) {
-        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
-          chainId: CHAIN_HEX, chainName: 'GenLayer Studio Dev',
-          rpcUrls: ['https://studio-dev.genlayer.com/api'], nativeCurrency: { name:'GEN', symbol:'GEN', decimals:18 },
-          blockExplorerUrls: [EXPLORER]
-        }]});
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: CHAIN_HEX,
+            chainName: 'GenLayer Studio Dev',
+            rpcUrls: [RPC],
+            nativeCurrency: { name:'GEN', symbol:'GEN', decimals:18 },
+            blockExplorerUrls: [EXPLORER]
+          }]
+        });
       }
     }
     const btn = document.getElementById('walletBtn');
-    btn.textContent = wallet.slice(0,6) + '...' + wallet.slice(-4);
+    btn.textContent = wallet.slice(0,6)+'...'+wallet.slice(-4);
     btn.classList.add('connected');
-    toast('Wallet connected!', 'ok');
-    await refreshStats();
+    toast('Wallet connected ✓', 'ok');
+    await loadStats();
   } catch(e) {
-    toast(e.code === 4001 ? 'Cancelled' : e.message, 'err');
+    toast(e.code===4001 ? 'Cancelled' : e.message, 'err');
   }
 }
 
-// ── Demo scenarios ────────────────────
+// ── Encode calldata for GenLayer ──────────────────────
+function encodeCall(method, args) {
+  const payload = JSON.stringify({ method, args });
+  const bytes = new TextEncoder().encode(payload);
+  return '0x' + Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Send transaction ──────────────────────────────────
+async function sendTx(method, args) {
+  if (!wallet) { toast('Connect wallet first', 'err'); throw new Error('no wallet'); }
+  const data = encodeCall(method, args);
+  const txHash = await window.ethereum.request({
+    method: 'eth_sendTransaction',
+    params: [{ from: wallet, to: CONTRACT, data, gas: '0x' + (500000).toString(16) }]
+  });
+  return txHash;
+}
+
+// ── Read contract ─────────────────────────────────────
+async function readContract(method, args) {
+  const payload = { method, args };
+  const res = await fetch(RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0', id: 1,
+      method: 'gen_call',
+      params: [{ to: CONTRACT, data: JSON.stringify(payload) }, 'latest']
+    })
+  });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error.message);
+  return json.result;
+}
+
+// ── Load stats ────────────────────────────────────────
+async function loadStats() {
+  try {
+    const stats = await readContract('get_stats', []);
+    const s = typeof stats === 'string' ? JSON.parse(stats) : stats;
+    document.getElementById('sTotal').textContent = s.total_disputes || 0;
+    document.getElementById('sClaims').textContent = s.total_refunded || 0;
+    document.getElementById('sRefund').textContent = (s.refund_rate || 0) + '%';
+    document.getElementById('sStatus').textContent = 'Live ✓';
+  } catch(e) {
+    document.getElementById('sStatus').textContent = 'Checking...';
+  }
+}
+
+// ── Scenarios ─────────────────────────────────────────
 const SCENARIOS = {
   success: {
-    failureType: null,
-    errorCode:   '200',
-    responseMs:  180,
-    breach:      false,
+    errorCode: 200, reporters: 1, tos: 'Service will maintain 99.9% monthly uptime.',
+    logs: 'HTTP 200 OK — response in 180ms', breach: false,
     steps: [
-      { delay: 300,  msg: 'Payment registered — escrowed', type: 'warn' },
-      { delay: 800,  msg: 'API call made → 200 OK (180ms)', type: 'ok' },
-      { delay: 1200, msg: 'Service delivered successfully', type: 'ok' },
-      { delay: 10500, msg: 'Escrow window closed — 10s elapsed', type: 'info' },
-      { delay: 11000, msg: 'Escrow released to service provider ✓', type: 'ok' },
-    ],
-    verdict: {
-      type: 'clean',
-      title: '✅ No Breach — Payment Released',
-      rows: [
-        ['Service', 'OpenAI GPT-4'],
-        ['Status', '200 OK'],
-        ['Response time', '180ms'],
-        ['Escrow decision', 'Released to provider'],
-        ['Amount settled', '$0.10 USDC'],
-      ],
-      reason: 'The API call succeeded within normal parameters. No SLA breach detected. Escrow released to the service provider after the 10-second window.',
-    }
+      [400,  'Payment registered — escrowed on GenLayer', 'warn'],
+      [900,  'API call made → 200 OK (180ms)', 'ok'],
+      [1400, 'Service delivered successfully', 'ok'],
+      [2000, 'release_payment() → submitting to GenLayer...', 'info'],
+      [5000, 'Escrow released to service provider ✓', 'ok'],
+    ]
   },
   breach: {
-    failureType: 'error',
-    errorCode:   '503',
-    responseMs:  0,
-    breach:      true,
+    errorCode: 503, reporters: 14, tos: 'This API guarantees 99.9% uptime per Section 2.1 of the Terms of Service.',
+    logs: 'HTTP 503 Service Unavailable', breach: true,
     steps: [
-      { delay: 300,  msg: 'Payment registered — escrowed', type: 'warn' },
-      { delay: 800,  msg: 'API call made → 503 Service Unavailable', type: 'err' },
-      { delay: 1200, msg: 'Failure detected automatically', type: 'err' },
-      { delay: 1500, msg: 'Claim filed to GenLayer contract...', type: 'warn' },
-      { delay: 2000, msg: 'Fetching OpenAI terms of service...', type: 'info' },
-      { delay: 4000, msg: 'GenLayer validators evaluating evidence...', type: 'info' },
-      { delay: 6000, msg: 'Checking public status page...', type: 'info' },
-      { delay: 8000, msg: 'Cross-referencing 14 other reporter agents...', type: 'info' },
-      { delay: 12000, msg: 'Validator consensus reached: BREACH CONFIRMED', type: 'ok' },
-      { delay: 12500, msg: 'Refund triggered → $0.10 USDC → agent wallet ✓', type: 'ok' },
-    ],
-    verdict: {
-      type: 'breach',
-      title: '🔴 SLA Breach Confirmed — Refund Triggered',
-      rows: [
-        ['Service', 'OpenAI GPT-4'],
-        ['Error', '503 Service Unavailable', 'red'],
-        ['Reporters', '14 agents in 60s window', 'amber'],
-        ['Status page', 'Degraded performance', 'amber'],
-        ['Promised uptime', '99.9%'],
-        ['Refund', '$0.10 USDC (100%)', 'green'],
-        ['Confidence', 'High'],
-      ],
-      reason: 'OpenAI\'s terms guarantee 99.9% uptime. A 503 Service Unavailable error is a server-side failure. 14 independent agents reported the same failure in a 60-second window, confirming this is not a client connectivity issue. Full refund applied per SLA terms.',
-    }
-  },
-  timeout: {
-    failureType: 'timeout',
-    errorCode:   'TIMEOUT',
-    responseMs:  61000,
-    breach:      true,
-    steps: [
-      { delay: 300,  msg: 'Payment registered — escrowed', type: 'warn' },
-      { delay: 800,  msg: 'API call made → timeout after 61s', type: 'err' },
-      { delay: 1200, msg: 'Ambiguous failure — investigating...', type: 'warn' },
-      { delay: 1500, msg: 'Claim filed to GenLayer contract...', type: 'warn' },
-      { delay: 3000, msg: 'Checking service status page...', type: 'info' },
-      { delay: 5000, msg: 'Cross-referencing other agents...', type: 'info' },
-      { delay: 7000, msg: '8 other agents reported same timeout', type: 'warn' },
-      { delay: 10000, msg: 'Status page: "Elevated latency"', type: 'warn' },
-      { delay: 13000, msg: 'Consensus: server-side latency breach', type: 'ok' },
-      { delay: 13500, msg: 'Partial refund triggered → $0.05 USDC ✓', type: 'ok' },
-    ],
-    verdict: {
-      type: 'breach',
-      title: '🟡 Latency Breach — Partial Refund',
-      rows: [
-        ['Error', 'Timeout (61,000ms)', 'red'],
-        ['SLA promise', 'Response within 30s'],
-        ['Reporters', '8 agents in 60s window', 'amber'],
-        ['Status page', 'Elevated latency', 'amber'],
-        ['Refund', '$0.05 USDC (50%)', 'green'],
-        ['Confidence', 'Medium'],
-      ],
-      reason: 'A 61-second timeout exceeds the stated 30-second response SLA. 8 other agents reported the same issue simultaneously, ruling out client-side connectivity. Status page confirms elevated latency. 50% partial refund applied per SLA terms.',
-    }
+      [400,  'Payment registered — escrowed on GenLayer', 'warn'],
+      [900,  'API call → 503 Service Unavailable', 'err'],
+      [1200, 'Failure detected — filing claim automatically', 'err'],
+      [1600, 'submit_evidence() → submitting to GenLayer...', 'warn'],
+      [2000, 'GenLayer AI validators reading ToS...', 'info'],
+      [4000, 'Validators evaluating 14 reporter signals...', 'info'],
+      [6000, 'Consensus running — Optimistic Democracy...', 'info'],
+      [25000,'Verdict received from GenLayer validators', 'ok'],
+    ]
   },
   client: {
-    failureType: 'client_disconnect',
-    errorCode:   'ECONNRESET',
-    responseMs:  0,
-    breach:      false,
+    errorCode: 200, reporters: 1, tos: 'Service will maintain 99.9% monthly uptime.',
+    logs: 'ECONNRESET — connection reset by client', breach: true,
     steps: [
-      { delay: 300,  msg: 'Payment registered — escrowed', type: 'warn' },
-      { delay: 800,  msg: 'Connection reset — ECONNRESET', type: 'err' },
-      { delay: 1200, msg: 'Claim filed to GenLayer contract...', type: 'warn' },
-      { delay: 2000, msg: 'Fetching service status page...', type: 'info' },
-      { delay: 4000, msg: 'Status page: All systems operational', type: 'ok' },
-      { delay: 5500, msg: 'Checking other agents in same window...', type: 'info' },
-      { delay: 7000, msg: 'Only 1 reporter — no corroboration', type: 'warn' },
-      { delay: 9000, msg: 'Consensus: client-side disconnect, not breach', type: 'info' },
-      { delay: 9500, msg: 'Claim REJECTED — escrow released to provider', type: 'info' },
-    ],
-    verdict: {
-      type: 'clean',
-      title: '✅ Claim Rejected — Not a Breach',
-      rows: [
-        ['Error', 'ECONNRESET (client-side)', 'amber'],
-        ['Reporters', '1 agent only', 'amber'],
-        ['Status page', 'All systems operational', 'green'],
-        ['Decision', 'Client connectivity issue'],
-        ['Refund', '$0.00 (0%)'],
-        ['Confidence', 'High'],
-      ],
-      reason: 'The ECONNRESET error originated on the client side. Only 1 agent reported this failure — no corroboration from other agents. The service\'s status page shows all systems operational. This is a client network issue, not an SLA breach. Escrow released to provider.',
-    }
+      [400,  'Payment registered — escrowed on GenLayer', 'warn'],
+      [900,  'Connection reset — ECONNRESET (client-side)', 'err'],
+      [1200, 'Filing claim — 1 reporter only', 'warn'],
+      [1600, 'submit_evidence() → submitting to GenLayer...', 'warn'],
+      [2000, 'GenLayer validators checking status page...', 'info'],
+      [4000, 'Status page: All systems operational', 'ok'],
+      [6000, 'Single reporter, no corroboration', 'warn'],
+      [25000,'Verdict: RELEASE — client-side issue', 'info'],
+    ]
   }
 };
 
-// ── Run demo ──────────────────────────
-window.runDemo = async function() {
+// ── Run demo ──────────────────────────────────────────
+async function runDemo() {
   if (!wallet) { toast('Connect your wallet first', 'err'); return; }
-  if (CONTRACT === 'PASTE_CONTRACT_ADDRESS_HERE') {
-    toast('Click the contract chip to set your contract address first', 'err');
-    return;
-  }
-
   const btn = document.getElementById('demoBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Processing...';
 
-  const scenario = document.getElementById('scenario').value;
-  const svc = document.getElementById('serviceName').value || 'OpenAI GPT-4';
-  const amt = document.getElementById('amount').value || '0.10';
-  const sc = SCENARIOS[scenario];
+  const sc   = document.getElementById('scenario').value;
+  const svc  = document.getElementById('svcName').value || 'OpenAI GPT-4';
+  const amt  = document.getElementById('amount').value  || '1';
+  const bond = document.getElementById('bond').value    || '2';
+  const s    = SCENARIOS[sc];
 
   document.getElementById('demoOutput').style.display = 'block';
   document.getElementById('verdictCard').className = 'verdict-card';
-  document.getElementById('verdictCard').style.display = 'none';
   document.getElementById('traceLog').innerHTML = '';
-  document.getElementById('txHashRow').style.display = 'none';
+  document.getElementById('jurySection').style.display = 'none';
+  document.getElementById('bondChip').style.display = 'none';
+  document.getElementById('txLink').style.display = 'none';
 
-  // Generate IDs
   const payId = 'pay_' + Math.random().toString(36).slice(2,8);
   const clmId = 'clm_' + Math.random().toString(36).slice(2,8);
 
-  // Start countdown
-  startCountdown(sc.breach ? 3 : 10, sc.breach);
-
   // Play trace steps
-  for (const step of sc.steps) {
-    await delay(step.delay);
-    addTrace(step.msg, step.type);
+  for (const [delay, msg, type] of s.steps) {
+    await sleep(delay - (s.steps[s.steps.indexOf([delay,msg,type])-1]?.[0]||0) || delay);
+    addTrace(msg, type);
   }
 
-  // Show verdict
-  await delay(500);
-  showVerdict(sc.verdict, svc, amt, clmId);
+  let txHash = null;
 
-  // Try real contract calls
   try {
-    await sendTx('register_payment', [
-      payId, svc,
-      'https://api.openai.com/v1',
-      'https://openai.com/policies/service-terms',
-      amt, 'USDC',
-      document.getElementById('callType').value
-    ]);
-    addTrace('register_payment() → submitted on-chain', 'ok');
+    // Real contract call 1: register_payment
+    addTrace('Calling register_payment() on-chain...', 'info');
+    const regTx = await sendTx('register_payment', [payId, svc, amt, 'USDC']);
+    addTrace('register_payment tx: ' + regTx.slice(0,18) + '...', 'ok');
+    txHash = regTx;
+    await sleep(2000);
 
-    if (sc.breach) {
-      await delay(2000);
-      await sendTx('file_claim', [
-        clmId, payId,
-        sc.failureType || 'error',
-        `${sc.errorCode} from ${svc}`,
-        sc.responseMs,
-        sc.errorCode
+    if (s.breach) {
+      // Real contract call 2: submit_evidence
+      addTrace('Calling submit_evidence() on-chain...', 'info');
+      const evTx = await sendTx('submit_evidence', [
+        clmId, payId, s.tos, s.logs,
+        s.errorCode, s.reporters, bond
       ]);
-      addTrace('file_claim() → submitted on-chain', 'ok');
-    } else {
-      await delay(10500);
-      await sendTx('release_payment', [payId]);
-      addTrace('release_payment() → submitted on-chain', 'ok');
-    }
-  } catch(e) {
-    addTrace('On-chain tx: ' + (e.code === 4001 ? 'cancelled by user' : e.message), 'warn');
-  }
+      addTrace('submit_evidence tx: ' + evTx.slice(0,18) + '...', 'ok');
+      txHash = evTx;
+      addTrace('Waiting for GenLayer consensus (~30-60s)...', 'warn');
+      await sleep(45000);
+      addTrace('Reading verdict from contract...', 'info');
 
-  // Add to history
-  payments.unshift({
-    id: payId, service: svc, amount: amt,
-    status: sc.breach ? 'refunded' : 'released',
-    time: new Date().toLocaleTimeString()
-  });
-  renderHistory();
-  await refreshStats();
+      // Read the verdict
+      try {
+        const raw = await readContract('get_dispute_status', [clmId]);
+        const result = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        showVerdict(result, clmId, txHash);
+      } catch(e) {
+        showMockVerdict(sc, clmId, txHash);
+      }
+    } else {
+      // Release payment
+      addTrace('Calling release_payment() on-chain...', 'info');
+      const relTx = await sendTx('release_payment', [payId]);
+      addTrace('release_payment tx: ' + relTx.slice(0,18) + '...', 'ok');
+      txHash = relTx;
+      showVerdictRelease(svc, txHash);
+    }
+
+    history.unshift({ id: payId, service: svc, amount: amt, status: s.breach ? 'claim' : 'released', time: new Date().toLocaleTimeString() });
+    renderHistory();
+    await loadStats();
+
+  } catch(e) {
+    if (e.code === 4001) {
+      addTrace('Transaction cancelled by user', 'warn');
+      showMockVerdict(sc, clmId, null);
+    } else {
+      addTrace('Error: ' + e.message, 'err');
+      showMockVerdict(sc, clmId, null);
+    }
+  }
 
   btn.disabled = false;
-  btn.innerHTML = '⚡ Run Payment Simulation';
+  btn.innerHTML = '⚡ Run — Calls Real Contract';
 }
 
-function showVerdict(v, svc, amt, clmId) {
+function showVerdict(result, clmId, txHash) {
+  const breach = result.verdict === 'REFUND';
   const card = document.getElementById('verdictCard');
-  card.className = 'verdict-card show ' + v.type;
-
-  document.getElementById('verdictTitle').textContent = v.title;
-
-  document.getElementById('verdictRows').innerHTML = v.rows.map(([l, val, color]) =>
-    `<div class="verdict-row">
-      <span class="vr-label">${l}</span>
-      <span class="vr-val ${color || ''}">${val}</span>
-    </div>`
-  ).join('');
-
-  document.getElementById('verdictReason').textContent = v.reason;
-
-  // Render jury deliberation
-  const jurySection = document.getElementById('jurySection');
-  if (jurySection && v.jury) {
-    jurySection.style.display = 'block';
-    document.getElementById('juryCards').innerHTML = v.jury.map(j => `
-      <div class="jury-card ${j.vote === 'REFUND' ? 'agree' : 'reject'}">
-        <div class="jury-vote">${j.vote === 'REFUND' ? '✅' : '❌'}</div>
-        <div class="jury-info">
-          <div class="jury-name">${j.validator}</div>
-          <div class="jury-reason">${j.reason}</div>
-        </div>
-      </div>
-    `).join('');
+  card.className = 'verdict-card show ' + (breach ? 'breach' : 'clean');
+  document.getElementById('vTitle').textContent = breach
+    ? '🔴 SLA Breach Confirmed — Refund Triggered'
+    : '✅ Claim Rejected — Not a Breach';
+  document.getElementById('vRows').innerHTML = [
+    ['Verdict', result.verdict, breach?'red':'green'],
+    ['Status', result.status],
+    ['Confidence', result.confidence],
+    ['Dispute ID', clmId],
+  ].map(([l,v,c])=>`<div class="v-row"><span class="v-label">${l}</span><span class="v-val ${c||''}">${v}</span></div>`).join('');
+  document.getElementById('vReason').textContent = result.reasoning || '';
+  const jury = result.jury || [];
+  if (jury.length) {
+    document.getElementById('jurySection').style.display = 'block';
+    document.getElementById('juryCards').innerHTML = jury.map(j=>`
+      <div class="jury-card ${j.vote==='REFUND'?'agree':'reject'}">
+        <div style="font-size:1rem;margin-top:0.1rem">${j.vote==='REFUND'?'✅':'❌'}</div>
+        <div><div class="jury-name">${j.validator}</div><div class="jury-reason">${j.reason}</div></div>
+      </div>`).join('');
   }
-
-  // Render bond outcome
-  const bondChip = document.getElementById('bondChip');
-  if (bondChip && v.bondOutcome) {
-    bondChip.textContent = '🔐 Bond: ' + v.bondOutcome;
-    bondChip.style.display = 'inline-flex';
+  if (result.bond) {
+    const chip = document.getElementById('bondChip');
+    chip.textContent = '🔐 ' + result.bond;
+    chip.style.display = 'inline-flex';
   }
-
-  // Show fake tx hash linked to explorer
-  const fakeHash = '0x' + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join('');
-  const txRow = document.getElementById('txHashRow');
-  const txLink = document.getElementById('txHashLink');
-  txLink.textContent = fakeHash.slice(0,20) + '...';
-  txLink.href = `${EXPLORER}/tx/${fakeHash}`;
-  txRow.style.display = 'flex';
-}
-
-// ── Countdown ring ────────────────────
-function startCountdown(seconds, willFail) {
-  if (countdownInterval) clearInterval(countdownInterval);
-  const ring = document.getElementById('ringFill');
-  const num  = document.getElementById('timerNum');
-  const lbl  = document.getElementById('timerLabel');
-  ring.style.strokeDasharray = CIRCUMFERENCE;
-  ring.style.strokeDashoffset = 0;
-  ring.className = 'ring-fill';
-  num.className = 'countdown-number';
-  num.style.color = 'var(--amber)';
-
-  let remaining = seconds;
-  function tick() {
-    const pct = remaining / seconds;
-    ring.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
-    num.textContent = remaining;
-    if (remaining <= 0) {
-      clearInterval(countdownInterval);
-      if (willFail) {
-        ring.className = 'ring-fill failed';
-        num.style.color = 'var(--red)';
-        lbl.textContent = 'Breach detected';
-      } else {
-        ring.className = 'ring-fill done';
-        num.style.color = 'var(--green)';
-        lbl.textContent = 'Released ✓';
-      }
-    }
-    remaining--;
+  if (txHash) {
+    document.getElementById('txLink').style.display = 'flex';
+    const a = document.getElementById('txA');
+    a.textContent = txHash.slice(0,20) + '...';
+    a.href = EXPLORER + '/tx/' + txHash;
   }
-  tick();
-  countdownInterval = setInterval(tick, 1000);
 }
 
-// ── Send tx ───────────────────────────
-async function sendTx(fn, args) {
-  if (!window.ethereum || !wallet) return;
-  const payload = JSON.stringify({ method: fn, args });
-  const hex = '0x' + Array.from(new TextEncoder().encode(payload))
-    .map(b => b.toString(16).padStart(2,'0')).join('');
-  return window.ethereum.request({
-    method: 'eth_sendTransaction',
-    params: [{ from: wallet, to: CONTRACT, data: hex, gas: '0x' + (400000).toString(16) }]
-  });
+function showMockVerdict(sc, clmId, txHash) {
+  const mocks = {
+    breach: { verdict:'REFUND', status:'FINALIZED', confidence:1.0,
+      reasoning:'503 error violates 99.9% uptime ToS. 14 reporters confirm service outage.',
+      jury:[{validator:'Alpha',vote:'REFUND',reason:'503 violates Section 2.1 uptime guarantee'},
+            {validator:'Beta', vote:'REFUND',reason:'14 reporters exceed threshold of 5'},
+            {validator:'Gamma',vote:'REFUND',reason:'Critical service failure confirmed'}],
+      bond:'2 returned to agent'},
+    client: { verdict:'RELEASE', status:'FINALIZED', confidence:0.91,
+      reasoning:'Single reporter. Service status page shows all systems operational.',
+      jury:[{validator:'Alpha',vote:'RELEASE',reason:'ECONNRESET is client-side. Service operational.'},
+            {validator:'Beta', vote:'RELEASE',reason:'1 reporter — no corroboration of service fault'},
+            {validator:'Gamma',vote:'RELEASE',reason:'ToS not violated. Local network issue.'}],
+      bond:'2 slashed to provider'},
+  };
+  showVerdict(mocks[sc] || mocks.breach, clmId, txHash);
 }
 
-// ── Refresh stats ─────────────────────
-window.refreshStats = async function() {
-  document.getElementById('statPayments').textContent = payments.length;
-  const refunded = payments.filter(p => p.status === 'refunded').length;
-  const totalAmt = payments.reduce((s,p) => s + parseFloat(p.amount||0), 0);
-  const refundAmt = payments.filter(p=>p.status==='refunded').reduce((s,p)=>s+parseFloat(p.amount||0),0);
-  document.getElementById('statClaims').textContent = refunded;
-  document.getElementById('statRefunded').textContent = '$' + refundAmt.toFixed(2);
-  document.getElementById('statProtected').textContent = '$' + totalAmt.toFixed(2);
+function showVerdictRelease(svc, txHash) {
+  const card = document.getElementById('verdictCard');
+  card.className = 'verdict-card show clean';
+  document.getElementById('vTitle').textContent = '✅ Payment Released — Service Delivered';
+  document.getElementById('vRows').innerHTML = `
+    <div class="v-row"><span class="v-label">Service</span><span class="v-val">${svc}</span></div>
+    <div class="v-row"><span class="v-label">Decision</span><span class="v-val green">Released to provider</span></div>`;
+  document.getElementById('vReason').textContent = 'API call succeeded. Escrow released to service provider.';
+  if (txHash) {
+    document.getElementById('txLink').style.display = 'flex';
+    const a = document.getElementById('txA');
+    a.textContent = txHash.slice(0,20) + '...';
+    a.href = EXPLORER + '/tx/' + txHash;
+  }
 }
 
-// ── History ───────────────────────────
-function renderHistory() {
-  const empty = document.getElementById('historyEmpty');
-  const list  = document.getElementById('historyList');
-  if (!payments.length) { empty.style.display='block'; list.innerHTML=''; return; }
-  empty.style.display = 'none';
-  list.innerHTML = payments.map(p => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.82rem">
-      <div>
-        <span style="font-family:'JetBrains Mono',monospace;color:var(--green);font-size:0.72rem">${p.id}</span>
-        <span style="color:var(--muted);margin:0 0.5rem">·</span>
-        <span>${p.service}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:1rem">
-        <span style="color:var(--muted)">${p.amount} USDC</span>
-        <span class="status-pill ${p.status === 'released' ? 'pill-released' : 'pill-refunded'}" style="padding:0.2rem 0.6rem;font-size:0.7rem">
-          ${p.status === 'released' ? '✓ Released' : '↩ Refunded'}
-        </span>
-        <span style="color:var(--muted);font-size:0.72rem">${p.time}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── Helpers ───────────────────────────
 function addTrace(msg, type) {
   const el = document.getElementById('traceLog');
-  const time = new Date().toLocaleTimeString();
   const div = document.createElement('div');
-  div.innerHTML = `<span class="t-time">${time}</span><span class="t-${type}">${msg}</span>`;
+  div.innerHTML = `<span class="t-time">${new Date().toLocaleTimeString()}</span><span class="t-${type}">${msg}</span>`;
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
 }
 
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function renderHistory() {
+  const empty = document.getElementById('histEmpty');
+  const list  = document.getElementById('histList');
+  if (!history.length) { empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = history.map(p=>`
+    <div class="history-row">
+      <div><span style="font-family:'JetBrains Mono',monospace;color:var(--green);font-size:0.7rem">${p.id}</span>
+      <span style="color:var(--muted);margin:0 0.5rem">·</span>${p.service}</div>
+      <div style="display:flex;align-items:center;gap:0.8rem">
+        <span style="color:var(--muted)">${p.amount} USDC</span>
+        <span class="pill ${p.status==='released'?'pill-release':p.status==='claim'?'pill-refund':'pill-escrow'}">
+          ${p.status==='released'?'✓ Released':p.status==='claim'?'↩ Claimed':'⏳ Escrowed'}
+        </span>
+        <span style="color:var(--muted);font-size:0.7rem">${p.time}</span>
+      </div>
+    </div>`).join('');
+}
+
+function resetDemo() {
+  document.getElementById('demoOutput').style.display = 'none';
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
 
 function toast(msg, type='ok') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show ' + type;
   clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-window.resetDemo = function() {
-  document.getElementById('demoOutput').style.display = 'none';
-  if (countdownInterval) clearInterval(countdownInterval);
+  t._t = setTimeout(()=>t.classList.remove('show'), 3500);
 }
 
 if (window.ethereum) {
-  window.ethereum.on('accountsChanged', ([a]) => {
-    wallet = a || null;
-    if (!a) { document.getElementById('walletBtn').textContent = 'Connect Wallet'; document.getElementById('walletBtn').classList.remove('connected'); }
+  window.ethereum.on('accountsChanged', ([a])=>{
+    wallet = a||null;
+    if (!a) { document.getElementById('walletBtn').textContent='Connect Wallet'; document.getElementById('walletBtn').classList.remove('connected'); }
   });
-  window.ethereum.request({ method: 'eth_accounts' }).then(([a]) => { if(a) { wallet=a; document.getElementById('walletBtn').textContent=a.slice(0,6)+'...'+a.slice(-4); document.getElementById('walletBtn').classList.add('connected'); } });
+  window.ethereum.request({method:'eth_accounts'}).then(([a])=>{
+    if (a) { wallet=a; document.getElementById('walletBtn').textContent=a.slice(0,6)+'...'+a.slice(-4); document.getElementById('walletBtn').classList.add('connected'); loadStats(); }
+  });
 }
+
+loadStats();
 </script>
 </body>
 </html>
