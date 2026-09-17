@@ -12,6 +12,12 @@
 
 ---
 
+## Content 
+### The problem
+### How it works
+### FAQ
+### Post hackathon roadmap 
+
 ## The Problem
 
 AI agents are now paying for APIs autonomously via x402. When those services fail, the agent has no recourse. The money is simply gone.
